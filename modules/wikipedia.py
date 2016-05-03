@@ -111,7 +111,8 @@ def wikipedia(bot, trigger):
             lang = customlang.group(2)
 
     if trigger.group(2) is None:
-        bot.reply("What do you want me to look up?")
+        bot.notice('No arguments given for command.', trigger.nick)
+        bot.notice('Usage: .w thing.', trigger.nick)
         return NOLIMIT
 
     query = trigger.group(2)

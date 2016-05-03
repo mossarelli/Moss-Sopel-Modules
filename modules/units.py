@@ -11,7 +11,7 @@ from sopel.module import commands, example, NOLIMIT
 import re
 
 find_temp = re.compile('(-?[0-9]*\.?[0-9]*)[ °]*(K|C|F)', re.IGNORECASE)
-find_length = re.compile('([0-9]*\.?[0-9]*)[ ]*(mile[s]?|mi|inch|in|foot|feet|ft|yard[s]?|yd|(?:milli|centi|kilo|)meter[s]?|[mkc]?m|ly|light-year[s]?|au|astronomical unit[s]?|parsec[s]?|pc)', re.IGNORECASE)
+find_length = re.compile('([0-9]*\.?[0-9]*)[ ]*(mile[s]?|mi|inch|in|foot|feet|ft|yard[s]?|yd|(?:milli|centi|kilo|)meter[s]?|[mkc]?m|ls|light-second[s]?|ly|light-year[s]?|au|astronomical unit[s]?|parsec[s]?|pc)', re.IGNORECASE)
 find_mass = re.compile('([0-9]*\.?[0-9]*)[ ]*(lb|lbm|pound[s]?|ounce|oz|(?:kilo|)gram(?:me|)[s]?|[k]?g)', re.IGNORECASE)
 
 
@@ -42,7 +42,8 @@ def temperature(bot, trigger):
     try:
         source = find_temp.match(trigger.group(2)).groups()
     except (AttributeError, TypeError):
-        bot.reply("That's not a valid temperature.")
+    	bot.notice('No arguments or wrong arguments given for command.', trigger.nick)
+    	bot.notice('Usage: .temp 123[C|F|K].', trigger.nick)
         return NOLIMIT
     unit = source[1].upper()
     numeric = float(source[0])
@@ -57,7 +58,7 @@ def temperature(bot, trigger):
     kelvin = c_to_k(celsius)
     fahrenheit = c_to_f(celsius)
     bot.reply("{:.2f}°C = {:.2f}°F = {:.2f}K".format(celsius, fahrenheit, kelvin))
-
+    return NOLIMIT
 
 @commands('length', 'distance')
 @example('.distance 3m', '3.00m = 9 feet, 10.11 inches')
@@ -67,6 +68,7 @@ def temperature(bot, trigger):
 @example('.distance 3 feet', '91.44cm = 3 feet, 0.00 inches')
 @example('.distance 3 yards', '2.74m = 9 feet, 0.00 inches')
 @example('.distance 155cm', '1.55m = 5 feet, 1.02 inches')
+@example('.length 3 ls', '899400.00km = 558861.25 miles')
 @example('.length 3 ly', '28382191417742.40km = 17635876112814.77 miles')
 @example('.length 3 au', '448793612.10km = 278867421.71 miles')
 @example('.length 3 parsec', '92570329129020.20km = 57520535754731.61 miles')
@@ -77,7 +79,8 @@ def distance(bot, trigger):
     try:
         source = find_length.match(trigger.group(2)).groups()
     except (AttributeError, TypeError):
-        bot.reply("That's not a valid length unit.")
+    	bot.notice('No arguments or wrong arguments given for command.', trigger.nick)
+    	bot.notice('Usage: .distance 123 [m|mm|km|mi|in|cm|ft|yd|ly|ls|au|pc].', trigger.nick)
         return NOLIMIT
     unit = source[1].lower()
     numeric = float(source[0])
@@ -98,6 +101,8 @@ def distance(bot, trigger):
         meter = numeric / 3.2808
     elif unit in ("yards", "yard", "yd"):
         meter = numeric / (3.2808 / 3)
+    elif unit in ("light-second", "light-seconds", "ls"):
+        meter = numeric * 299800000
     elif unit in ("light-year", "light-years", "ly"):
         meter = numeric * 9460730472580800
     elif unit in ("astronomical unit", "astronomical units", "au"):
@@ -139,7 +144,7 @@ def distance(bot, trigger):
         stupid_part = ', '.join(parts)
 
     bot.reply('{} = {}'.format(metric_part, stupid_part))
-
+    return NOLIMIT
 
 @commands('weight', 'mass')
 def mass(bot, trigger):
@@ -149,7 +154,8 @@ def mass(bot, trigger):
     try:
         source = find_mass.match(trigger.group(2)).groups()
     except (AttributeError, TypeError):
-        bot.reply("That's not a valid mass unit.")
+    	bot.notice('No arguments or wrong arguments given for command.', trigger.nick)
+    	bot.notice('Usage: .weight 123 [g|kg|lb|oz].', trigger.nick)
         return NOLIMIT
     unit = source[1].lower()
     numeric = float(source[0])
@@ -180,6 +186,7 @@ def mass(bot, trigger):
         stupid_part = '{:.2f} oz'.format(ounce)
 
     bot.reply('{} = {}'.format(metric_part, stupid_part))
+    return NOLIMIT
 
 if __name__ == "__main__":
     from sopel.test_tools import run_example_tests

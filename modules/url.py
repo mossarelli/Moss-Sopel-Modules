@@ -10,7 +10,7 @@ from __future__ import unicode_literals, absolute_import, print_function, divisi
 import re
 from contextlib import closing
 from sopel import web, tools
-from sopel.module import commands, rule, example
+from sopel.module import NOLIMIT, commands, rule, example
 from sopel.config.types import ValidatedAttribute, ListAttribute, StaticSection
 
 import requests
@@ -82,7 +82,7 @@ def setup(bot=None):
                             (bot.config.url.exclusion_char), re.IGNORECASE)
 
 
-@commands('title')
+@commands('title','lasturl')
 @example('.title http://google.com', '[ Google ] - google.com')
 def title_command(bot, trigger):
     """
@@ -105,6 +105,7 @@ def title_command(bot, trigger):
     results = process_urls(bot, trigger, urls)
     for title, domain in results[:4]:
         bot.reply('[ %s ] - %s' % (title, domain))
+    return NOLIMIT
 
 
 @rule('(?u).*(https?://\S+).*')
@@ -134,6 +135,7 @@ def title_auto(bot, trigger):
         # Guard against responding to other instances of this bot.
         if message != trigger:
             bot.say(message)
+        return NOLIMIT
 
 
 def process_urls(bot, trigger, urls):

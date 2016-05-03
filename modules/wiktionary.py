@@ -10,7 +10,7 @@ from __future__ import unicode_literals, absolute_import, print_function, divisi
 
 import re
 from sopel import web
-from sopel.module import commands, example
+from sopel.module import NOLIMIT, commands, example
 
 uri = 'http://en.wiktionary.org/w/index.php?title=%s&printable=yes'
 r_tag = re.compile(r'<[^>]+>')
@@ -82,13 +82,14 @@ def wiktionary(bot, trigger):
     """Look up a word on Wiktionary."""
     word = trigger.group(2)
     if word is None:
-        bot.reply('You must tell me what to look up!')
-        return
+        bot.notice('No arguments given for command.', trigger.nick)
+        bot.notice('Usage: .wt word.', trigger.nick)
+        return NOLIMIT
 
     _etymology, definitions = wikt(word)
     if not definitions:
         bot.say("Couldn't get any definitions for %s." % word)
-        return
+        return NOLIMIT
 
     result = format(word, definitions)
     if len(result) < 150:

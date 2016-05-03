@@ -86,16 +86,18 @@ def f_remind(bot, trigger):
     teller = trigger.nick
     verb = trigger.group(1)
 
-    if not trigger.group(3):
-        bot.reply("%s whom?" % verb)
-        return
+    if trigger.group(2) is None:
+        bot.notice('No arguments given for command.', trigger.nick)
+        bot.notice('Usage: .tell username message.', trigger.nick)
+        return 1
 
     tellee = trigger.group(3).rstrip('.,:;')
     msg = trigger.group(2).lstrip(tellee).lstrip()
 
     if not msg:
-        bot.reply("%s %s what?" % (verb, tellee))
-        return
+        bot.notice('Argument missing: message.', trigger.nick)
+        bot.notice('Usage: .tell username message.', trigger.nick)
+        return 1
 
     tellee = Identifier(tellee)
 

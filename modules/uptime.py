@@ -8,7 +8,7 @@ http://sopel.chat
 """
 from __future__ import unicode_literals, absolute_import, print_function, division
 
-from sopel.module import commands
+from sopel.module import NOLIMIT, commands
 import datetime
 
 
@@ -23,5 +23,6 @@ def uptime(bot, trigger):
     delta = datetime.timedelta(seconds=round((datetime.datetime.utcnow() -
                                               bot.memory["uptime"])
                                              .total_seconds()))
-    bot.say("I've been sitting here for {} and I keep "
-            "going!".format(delta))
+    bot.notice("I've been sitting here for {} and I keep "
+            "going!".format(delta), trigger.nick)
+    return NOLIMIT
